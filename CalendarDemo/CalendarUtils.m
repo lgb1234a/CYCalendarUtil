@@ -30,7 +30,7 @@
     // 校验用户是否安装了日历📅
     if(![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"calshow://"]]) {
         // toast
-        completion(@"未安装系统日历！");
+        completion(@"未找到手机日历，导入失败！");
         return;
     }
     
@@ -43,7 +43,10 @@
             return;
         }
         
-        EKEvent *event = [EKEvent eventWithEventStore:store];
+        EKEvent *event = [store eventWithIdentifier:@"555"];
+        if(!event) {
+            event = [EKEvent eventWithEventStore:store];
+        }
         event.title = model.title;
         event.startDate = model.startDate;
         event.endDate = model.endDate;
@@ -96,14 +99,35 @@
             calendar = calenders.firstObject;
         }
         
+        NSString *identifier = [[NSUserDefaults standardUserDefaults] objectForKey:model.eventIdentifier];
+        if(identifier) {
+            BOOL result = [CalendarUtils deleteEventWithIdentifier:identifier fromStore:store];
+            if(!result) {
+                completion(@"导入日历异常！");
+            }
+        }
+        
         [event setCalendar:calendar];
         [store saveEvent:event span:EKSpanThisEvent error:&err];
         if(err) {
-            completion(@"提醒导入日历异常！");
+            completion(@"导入日历异常！");
         }else {
+            [[NSUserDefaults standardUserDefaults] setObject:event.calendarItemIdentifier forKey:model.eventIdentifier];
             completion(@"导入成功！");
         }
     }];
+}
+
+// 删除重复identifier的事件，防止重复添加
++ (BOOL)deleteEventWithIdentifier:(NSString *)identifier fromStore:(EKEventStore *)store
+{
+    EKEvent *event = (EKEvent *)[store calendarItemWithIdentifier:identifier];
+    if(event) {
+        NSError *error;
+        BOOL result = [store removeEvent:event span:EKSpanThisEvent error:&error];
+        return result;
+    }
+    return NO;
 }
 
 @end

@@ -35,6 +35,7 @@
     model.endDate = self.endTimePicker.date;
     model.alarmTimeBeforeEventBegin = [self.alarmTimeBeforeEventBegin.text floatValue];
     model.notes = self.noteTextView.text;
+    model.eventIdentifier = @"test";
     [CalendarUtils addEvent:model complete:nil];
 }
 

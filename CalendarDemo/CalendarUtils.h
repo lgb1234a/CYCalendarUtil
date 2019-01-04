@@ -17,7 +17,12 @@
 @property (nonatomic, copy, nonnull) NSString *title;
 
 /**
- 事件所属日历名, 默认是'途牛'
+ 事件唯一标识符
+ */
+@property (nonatomic, copy, nonnull) NSString *eventIdentifier;
+
+/**
+ 自定义事件所属日历, 默认是'途牛'
  */
 @property (nonatomic, copy) NSString *calendarName;
 
