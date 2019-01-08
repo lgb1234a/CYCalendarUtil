@@ -36,6 +36,8 @@
     model.alarmTimeBeforeEventBegin = [self.alarmTimeBeforeEventBegin.text floatValue];
     model.notes = self.noteTextView.text;
     model.eventIdentifier = @"test";
+    // get timeZone name by: NSArray *timeZoneNames = [NSTimeZone knownTimeZoneNames];
+    model.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"Pacific/Tongatapu"];
     [CalendarUtils addEvent:model complete:nil];
 }
 

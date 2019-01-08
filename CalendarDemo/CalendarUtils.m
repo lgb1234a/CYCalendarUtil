@@ -40,34 +40,20 @@
             return;
         }else if (!granted) {
             completion(@"未允许app访问您的日历！");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+            });
             return;
         }
         
-        EKEvent *event = [store eventWithIdentifier:@"555"];
-        if(!event) {
-            event = [EKEvent eventWithEventStore:store];
-        }
-        event.title = model.title;
-        event.startDate = model.startDate;
-        event.endDate = model.endDate;
-        
-        event.timeZone = model.timeZone?: [NSTimeZone systemTimeZone];
-        event.allDay = model.allDay;
-        [event addAlarm:[EKAlarm alarmWithRelativeOffset:model.alarmTimeBeforeEventBegin]];
-        
-        if(model.recurrenceRule) {
-            [event addRecurrenceRule:model.recurrenceRule];
-        }
-        
-        event.notes = model.notes;
         NSError *err;
         
         EKCalendar *calendar = nil;
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.title MATCHES %@", model.calendarName?:@"途牛"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.title MATCHES %@", model.calendarName.length > 0? model.calendarName:@"默认"];
         NSArray *calenders = [[store calendarsForEntityType:EKEntityTypeEvent] filteredArrayUsingPredicate:predicate];
         if(calenders.count == 0) {
             calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:store];
-            calendar.title = model.calendarName?:@"途牛";
+            calendar.title = model.calendarName.length > 0? model.calendarName:@"默认";
             
             // Iterate over all sources in the event store and look for the local source
             EKSource *theSource = nil;
@@ -99,6 +85,7 @@
             calendar = calenders.firstObject;
         }
         
+        // 校验日历里面是否已经存在当前id的事件
         NSString *identifier = [[NSUserDefaults standardUserDefaults] objectForKey:model.eventIdentifier];
         if(identifier) {
             BOOL result = [CalendarUtils deleteEventWithIdentifier:identifier fromStore:store];
@@ -106,6 +93,22 @@
                 completion(@"导入日历异常！");
             }
         }
+        
+        EKEvent *event = [EKEvent eventWithEventStore:store];
+        
+        event.title = model.title;
+        event.startDate = model.startDate;
+        event.endDate = model.endDate;
+        
+        event.timeZone = model.timeZone?: [NSTimeZone systemTimeZone];
+        event.allDay = model.allDay;
+        [event addAlarm:[EKAlarm alarmWithRelativeOffset:model.alarmTimeBeforeEventBegin]];
+        
+        if(model.recurrenceRule) {
+            [event addRecurrenceRule:model.recurrenceRule];
+        }
+        
+        event.notes = model.notes;
         
         [event setCalendar:calendar];
         [store saveEvent:event span:EKSpanThisEvent error:&err];
