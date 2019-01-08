@@ -37,7 +37,7 @@
     model.notes = self.noteTextView.text;
     model.eventIdentifier = @"test";
     // get timeZone name by: NSArray *timeZoneNames = [NSTimeZone knownTimeZoneNames];
-    model.timeZone = [NSTimeZone timeZoneWithAbbreviation:@"Pacific/Tongatapu"];
+    model.timeZone = [NSTimeZone timeZoneWithName:@"Pacific/Tongatapu"];
     [CalendarUtils addEvent:model complete:nil];
 }
 
