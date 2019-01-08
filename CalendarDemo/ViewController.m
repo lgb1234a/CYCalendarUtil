@@ -38,6 +38,11 @@
     model.eventIdentifier = @"test";
     // get timeZone name by: NSArray *timeZoneNames = [NSTimeZone knownTimeZoneNames];
     model.timeZone = [NSTimeZone timeZoneWithName:@"Pacific/Tongatapu"];
+    
+    NSDateFormatter* df_utc = [[NSDateFormatter alloc] init];
+    [df_utc setTimeZone:[NSTimeZone timeZoneWithName:@"UTC+1"]];
+    model.timeZone = df_utc.timeZone;
+    
     [CalendarUtils addEvent:model complete:nil];
 }
 

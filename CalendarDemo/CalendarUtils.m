@@ -130,7 +130,7 @@
         BOOL result = [store removeEvent:event span:EKSpanThisEvent error:&error];
         return result;
     }
-    return NO;
+    return YES;
 }
 
 @end
