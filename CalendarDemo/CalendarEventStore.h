@@ -66,9 +66,11 @@
 @end
 
 
-@interface CalendarUtils : NSObject
+@interface CalendarEventStore : EKEventStore
+
++ (CalendarEventStore *)shareStore;
 
 // 添加事件到日历
-+ (void)addEvent:(CalendarEKModel *)model complete:(void (^)(NSString *cmpStr))completion;
+- (void)addEvent:(CalendarEKModel *)model complete:(void (^)(NSString *cmpStr))completion;
 
 @end

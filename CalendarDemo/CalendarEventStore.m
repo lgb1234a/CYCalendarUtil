@@ -6,16 +6,39 @@
 //  Copyright © 2018 chenyn. All rights reserved.
 //
 
-#import "CalendarUtils.h"
+#import "CalendarEventStore.h"
 #import <UIKit/UIKit.h>
 
 @implementation CalendarEKModel
 
 @end
 
-@implementation CalendarUtils
+@implementation CalendarEventStore
 
-+ (void)addEvent:(CalendarEKModel *)model complete:(void (^)(NSString *cmpStr))completion
+static CalendarEventStore *_shareStore = nil;
+
++ (CalendarEventStore *)shareStore
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _shareStore = [[super allocWithZone:NULL] init];
+    });
+    return _shareStore;
+}
+
++ (id)allocWithZone:(struct _NSZone *)zone
+{
+    return [self shareStore];
+}
+
++ (id)copyWithZone:(struct _NSZone *)zone
+{
+    return [self shareStore];
+}
+
+
+// 添加事件
+- (void)addEvent:(CalendarEKModel *)model complete:(void (^)(NSString *cmpStr))completion
 {
     if(!completion) {
         completion = ^(NSString *cmpStr) {
@@ -25,8 +48,6 @@
         };
     }
     
-    EKEventStore *store = [[EKEventStore alloc] init];
-    
     // 校验用户是否安装了日历📅
     if(![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"calshow://"]]) {
         // toast
@@ -34,7 +55,7 @@
         return;
     }
     
-    [store requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError * _Nullable error) {
+    [self requestAccessToEntityType:EKEntityTypeEvent completion:^(BOOL granted, NSError * _Nullable error) {
         if(error) {
             completion(@"日历访问异常！");
             return;
@@ -50,14 +71,14 @@
         
         EKCalendar *calendar = nil;
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.title MATCHES %@", model.calendarName.length > 0? model.calendarName:@"默认"];
-        NSArray *calenders = [[store calendarsForEntityType:EKEntityTypeEvent] filteredArrayUsingPredicate:predicate];
+        NSArray *calenders = [[self calendarsForEntityType:EKEntityTypeEvent] filteredArrayUsingPredicate:predicate];
         if(calenders.count == 0) {
-            calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:store];
+            calendar = [EKCalendar calendarForEntityType:EKEntityTypeEvent eventStore:self];
             calendar.title = model.calendarName.length > 0? model.calendarName:@"默认";
             
             // Iterate over all sources in the event store and look for the local source
             EKSource *theSource = nil;
-            for (EKSource *source in store.sources) {
+            for (EKSource *source in self.sources) {
                 // 获取source
                 if (source.sourceType == EKSourceTypeLocal) {
                     theSource = source;
@@ -76,7 +97,7 @@
                 completion(@"日历初始化异常！");
                 return;
             }
-            BOOL result = [store saveCalendar:calendar commit:YES error:&error];
+            BOOL result = [self saveCalendar:calendar commit:YES error:&error];
             if(!result) {
                 completion(@"日历初始化异常！");
                 return;
@@ -88,13 +109,13 @@
         // 校验日历里面是否已经存在当前id的事件
         NSString *identifier = [[NSUserDefaults standardUserDefaults] objectForKey:model.eventIdentifier];
         if(identifier) {
-            BOOL result = [CalendarUtils deleteEventWithIdentifier:identifier fromStore:store];
+            BOOL result = [[CalendarEventStore shareStore] deleteEventWithIdentifier:identifier];
             if(!result) {
                 completion(@"导入日历异常！");
             }
         }
         
-        EKEvent *event = [EKEvent eventWithEventStore:store];
+        EKEvent *event = [EKEvent eventWithEventStore:self];
         
         event.title = model.title;
         event.startDate = model.startDate;
@@ -110,24 +131,26 @@
         
         event.notes = model.notes;
         
-        [event setCalendar:calendar];
-        [store saveEvent:event span:EKSpanThisEvent error:&err];
-        if(err) {
-            completion(@"导入日历异常！");
-        }else {
-            [[NSUserDefaults standardUserDefaults] setObject:event.calendarItemIdentifier forKey:model.eventIdentifier];
-            completion(@"导入成功！");
+        @synchronized (self) {
+            [event setCalendar:calendar];
+            [self saveEvent:event span:EKSpanThisEvent error:&err];
+            if(err) {
+                completion(@"导入日历异常！");
+            }else {
+                [[NSUserDefaults standardUserDefaults] setObject:event.calendarItemIdentifier forKey:model.eventIdentifier];
+                completion(@"导入成功！");
+            }
         }
     }];
 }
 
 // 删除重复identifier的事件，防止重复添加
-+ (BOOL)deleteEventWithIdentifier:(NSString *)identifier fromStore:(EKEventStore *)store
+- (BOOL)deleteEventWithIdentifier:(NSString *)identifier
 {
-    EKEvent *event = (EKEvent *)[store calendarItemWithIdentifier:identifier];
+    EKEvent *event = (EKEvent *)[self calendarItemWithIdentifier:identifier];
     if(event) {
         NSError *error;
-        BOOL result = [store removeEvent:event span:EKSpanThisEvent error:&error];
+        BOOL result = [self removeEvent:event span:EKSpanThisEvent error:&error];
         return result;
     }
     return YES;

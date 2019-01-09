@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "CalendarUtils.h"
+#import "CalendarEventStore.h"
 
 @interface ViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *calendarTitle;
@@ -43,7 +43,7 @@
     [df_utc setTimeZone:[NSTimeZone timeZoneWithName:@"UTC+1"]];
     model.timeZone = df_utc.timeZone;
     
-    [CalendarUtils addEvent:model complete:nil];
+    [[CalendarEventStore shareStore] addEvent:model complete:nil];
 }
 
 @end

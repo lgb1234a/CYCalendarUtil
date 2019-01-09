@@ -15,7 +15,7 @@
 		EF4635C321D73B5900E813CF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EF4635C221D73B5900E813CF /* main.m */; };
 		EF4635CD21D73B5900E813CF /* CalendarDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF4635CC21D73B5900E813CF /* CalendarDemoTests.m */; };
 		EF4635D821D73B5900E813CF /* CalendarDemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF4635D721D73B5900E813CF /* CalendarDemoUITests.m */; };
-		EF4635E721D73C0A00E813CF /* CalendarUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = EF4635E621D73C0A00E813CF /* CalendarUtils.m */; };
+		EF4635E721D73C0A00E813CF /* CalendarEventStore.m in Sources */ = {isa = PBXBuildFile; fileRef = EF4635E621D73C0A00E813CF /* CalendarEventStore.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,8 +52,8 @@
 		EF4635D321D73B5900E813CF /* CalendarDemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CalendarDemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF4635D721D73B5900E813CF /* CalendarDemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarDemoUITests.m; sourceTree = "<group>"; };
 		EF4635D921D73B5900E813CF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		EF4635E521D73C0A00E813CF /* CalendarUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CalendarUtils.h; sourceTree = "<group>"; };
-		EF4635E621D73C0A00E813CF /* CalendarUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarUtils.m; sourceTree = "<group>"; };
+		EF4635E521D73C0A00E813CF /* CalendarEventStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CalendarEventStore.h; sourceTree = "<group>"; };
+		EF4635E621D73C0A00E813CF /* CalendarEventStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CalendarEventStore.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,8 +113,8 @@
 				EF4635BE21D73B5900E813CF /* LaunchScreen.storyboard */,
 				EF4635C121D73B5900E813CF /* Info.plist */,
 				EF4635C221D73B5900E813CF /* main.m */,
-				EF4635E521D73C0A00E813CF /* CalendarUtils.h */,
-				EF4635E621D73C0A00E813CF /* CalendarUtils.m */,
+				EF4635E521D73C0A00E813CF /* CalendarEventStore.h */,
+				EF4635E621D73C0A00E813CF /* CalendarEventStore.m */,
 			);
 			path = CalendarDemo;
 			sourceTree = "<group>";
@@ -268,7 +268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF4635B821D73B5700E813CF /* ViewController.m in Sources */,
-				EF4635E721D73C0A00E813CF /* CalendarUtils.m in Sources */,
+				EF4635E721D73C0A00E813CF /* CalendarEventStore.m in Sources */,
 				EF4635C321D73B5900E813CF /* main.m in Sources */,
 				EF4635B521D73B5700E813CF /* AppDelegate.m in Sources */,
 			);
